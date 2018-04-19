@@ -39,12 +39,12 @@ void loop()
   mq131Value = analogRead(1);
   mq4Value = analogRead(2);
   altiValue = analogRead(4);
-  Serial.print(mq135Value, DEC);  // prints the value read
-  Serial.println("ppm");
-  Serial.print(mq131Value, DEC);
-  Serial.println("ppb");
-  Serial.print(mq4Value, DEC);
-  Serial.println("ppm");
+  Serial.println(mq135Value, DEC);  // prints the value read
+//  Serial.println("ppm");
+  Serial.println(mq131Value, DEC);
+//  Serial.println("ppb");
+  Serial.println(mq4Value, DEC);
+//  Serial.println("ppm");
   Serial.println(altiValue, DEC);
   
   // Make sure the card is still present
