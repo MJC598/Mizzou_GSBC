@@ -5,16 +5,20 @@ import plotly.graph_objs as go
 mq135Data = []
 mq131Data = []
 mq4Data = []
+altData = []
 x_axis = []
 x_a = []
 xAxis = []
+xA = []
 i = 1
 j = 1
 k = 1
+z = 1
 
-mq135 = open("mq135.txt", "r")
-mq131 = open("mq131.txt", "r")
-mq4 = open("mq4.txt", "r")
+mq135 = open("MQ135.txt", "r")
+mq131 = open("MQ131.txt", "r")
+mq4 = open("MQ4.txt", "r")
+alt = open("ALTI.txt", "r")
 
 for line in mq135:
     mq135Data.append(line)
@@ -31,12 +35,18 @@ for line in mq4:
     xAxis.append(k)
     k+=1
     
+for line in alt:
+    altData.append(line)
+    xA.append(z)
+    z+=1
+    
     
 gasSensor = go.Scatter(x=x_axis, y=mq135Data, name='MQ135 Gas Sensor (ppm)')
 ozoneSensor = go.Scatter(x=x_a, y=mq131Data, name='MQ131 Ozone Sensor (ppb)')
 methaneSensor = go.Scatter(x=xAxis, y=mq4Data, name='MQ4 Methane Sensor (ppm)')
+altSensor = go.Scatter(x=xAxis, y=altData, name='Altimeter (ft)')
 
-data = [gasSensor, ozoneSensor, methaneSensor]
+data = [gasSensor, ozoneSensor, methaneSensor, altSensor]
 layout = go.Layout(title='Gasses', xaxis=dict(title='measurements'), yaxis=dict(title='Level'))
 fig = go.Figure(data=data, layout=layout)
 plot_url = plot(fig, filename='sensorReadings.html')
