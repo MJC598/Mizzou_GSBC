@@ -31,43 +31,56 @@ void setup()
   pinMode(cardDetect, INPUT);  
   pinMode(pin8, OUTPUT);
   initializeCard();
+  cleanCard();
 }
 
 void loop()
 {
   mq135Value = analogRead(0);  // read analog input pin 0
+  mq135Value *= .293255132;     //300/1023 (NH3ppm/analogVoltage)
+  mq135Value += 10;            //offset mq135 now stores correct value NH3 ppm (Range 10 - 300 ppm)
   mq131Value = analogRead(1);
-  mq4Value = analogRead(2);
-  altiValue = analogRead(4);
-  Serial.println(mq135Value, DEC);  // prints the value read
-//  Serial.println("ppm");
-  Serial.println(mq131Value, DEC);
-//  Serial.println("ppb");
-  Serial.println(mq4Value, DEC);
-//  Serial.println("ppm");
-  Serial.println(altiValue, DEC);
+  mq131Value *= .9775171065;   //1000/1023
+  mq131Value += 10;            //offset mq131 now stores correct value Ozone ppb
+  mq131Value /= 100;           //Now in ppm (Range 10 - 1000 ppm)
+  mq4Value = analogRead(2);   
+  mq4Value*=9.5703125;             
+  mq4Value+=200;               //mq4 stores correct value for CH4, natural gas ppm (Range 200 - 10000 ppm)
   
-  // Make sure the card is still present
+//  altiValue = analogRead(4);    //Temporarily removed for testing
+
+  Serial.print(mq135Value, DEC);  // prints the values calculated
+  Serial.println("ppm");
+  Serial.print(mq131Value, DEC);
+  Serial.println("ppm");
+  Serial.print(mq4Value, DEC);
+  Serial.println("ppm");
+//  Serial.println(altiValue, DEC);
+  Serial.println("----------------------");
+  
+  //Make sure the card is still present
   if (!digitalRead(cardDetect))
   {
     initializeCard();
+    cleanCard();
   }
-  mq135File = SD.open(file, FILE_WRITE);
+  mq135File = SD.open(file, FILE_WRITE); //The 4 lines here create file pointers used to write to the SD card
   mq131File = SD.open(file2, FILE_WRITE);
   mq4File = SD.open(file3, FILE_WRITE);
-  altiFile = SD.open(file4, FILE_WRITE);
-  mq135File.println(mq135Value);
+  
+//  altiFile = SD.open(file4, FILE_WRITE); //Temporarily removed for testing 
+
+  mq135File.println(mq135Value); //printing to each file pointer and thereby the SD card itself
   mq131File.println(mq131Value);
   mq4File.println(mq4Value);
-  altiFile.println(altiValue);
-//  mq135File.print("ppm ");
-//  mq131File.print("ppb ");
-//  mq4File.print("ppm ");
-//  altiFile.print(" ");
-  mq135File.close();
+  
+//  altiFile.println(altiValue); //Temporarily removed for testing 
+
+  mq135File.close(); //for the love of god close your file pointers
   mq131File.close();
   mq4File.close();
-  altiFile.close();
+  
+//  altiFile.close(); //Temporarily removed for testing 
   
   if (mq135Value > 500) {
     // Activate digital output pin 8 - the LED will light up
@@ -125,87 +138,17 @@ void initializeCard(void)
   Serial.println(F("Enter text to be written to file. 'EOF' will terminate writing."));
 }
 
-//////////////////////////////////////////////////////////////////////////////////
-//// Reads a byte from the serial connection. This also maintains the state to
-//// capture the EOF command.
-//////////////////////////////////////////////////////////////////////////////////
-//void readByte(void)
-//{
-//  byte byteRead = Serial.read();
-//  Serial.write(byteRead); // Echo
-//  buff[index++] = byteRead;
-//
-//  // Must be 'EOF' to not get confused with words such as 'takeoff' or 'writeoff'
-//  if (byteRead == 'E' && state == NORMAL)
-//  {
-//    state = E;
-//  }
-//  else if (byteRead == 'O' && state == E)
-//  {
-//    state = EO;
-//  }
-//  else if (byteRead == 'F' && state == EO)
-//  {
-//    eof();
-//    state = NORMAL;
-//  }
-//}
+//This function cleans the contents of the card
 
-////////////////////////////////////////////////////////////////////////////////
-// Write the buffer to the log file. If we are possibly in the EOF state, verify
-// that to make sure the command isn't written to the file.
-////////////////////////////////////////////////////////////////////////////////
-//void flushBuffer(void)
-//{
-//  mq135File = SD.open(file, FILE_WRITE);
-//  if (mq135File) {
-//    switch (state)  // If a flush occurs in the 'E' or the 'EO' state, read more to detect EOF
-//    {
-//    case NORMAL:
-//      break;
-//    case E:
-//      readByte();
-//      readByte();
-//      break;
-//    case EO:
-//      readByte();
-//      break;
-//    }
-//    mq135File.write(buff, index);
-//    mq135File.flush();
-//    index = 0;
-//    mq135File.close();
-//  }
-//}
-
-////////////////////////////////////////////////////////////////////////////////
-// This function is called after the EOF command is received. It writes the
-// remaining unwritten data to the µSD card, and prints out the full contents
-// of the log file.
-////////////////////////////////////////////////////////////////////////////////
-//void eof(void)
-//{
-//  index -= 3; // Remove EOF from the end
-//  flushBuffer();
-//
-//  // Re-open the file for reading:
-//  mq135File = SD.open(file);
-//  if (mq135File)
-//  {
-//    Serial.println("");
-//    Serial.print(file);
-//    Serial.println(":");
-//
-//    while (mq135File.available())
-//    {
-//      Serial.write(mq135File.read());
-//    }
-//  }
-//  else
-//  {
-//    Serial.print("Error opening ");
-//    Serial.println(file);
-//  }
-//  mq135File.close();
-//}
+void cleanCard(void){
+  if(SD.exists("mq135.txt")){
+    SD.remove("mq135.txt");
+  }
+  if(SD.exists("mq131.txt")){
+    SD.remove("mq131.txt");
+  }
+  if(SD.exists("mq4.txt")){
+    SD.remove("mq4.txt");
+  }
+}
 

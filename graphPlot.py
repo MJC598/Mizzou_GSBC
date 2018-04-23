@@ -42,7 +42,7 @@ for line in alt:
     
     
 gasSensor = go.Scatter(x=x_axis, y=mq135Data, name='MQ135 Gas Sensor (ppm)')
-ozoneSensor = go.Scatter(x=x_a, y=mq131Data, name='MQ131 Ozone Sensor (ppb)')
+ozoneSensor = go.Scatter(x=x_a, y=mq131Data, name='MQ131 Ozone Sensor (ppm)')
 methaneSensor = go.Scatter(x=xAxis, y=mq4Data, name='MQ4 Methane Sensor (ppm)')
 altSensor = go.Scatter(x=xAxis, y=altData, name='Altimeter (ft)')
 
