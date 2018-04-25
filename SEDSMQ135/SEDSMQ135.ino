@@ -4,16 +4,16 @@
 
 int mq135Value;
 int mq131Value;
-int mq4Value;
+//int mq4Value;
 int altiValue;
 char file[] = "mq135.txt";
 char file2[] = "mq131.txt";
-char file3[] = "mq4.txt";
+//char file3[] = "mq4.txt";
 char file4[] = "alti.txt";
 int pin8 = 8;
 File mq135File;
 File mq131File;
-File mq4File;
+//File mq4File;
 File altiFile;
 const uint8_t BUFFER_SIZE = 20;
 char buff[BUFFER_SIZE+2] = "";  // Added two to allow a 2 char peek for EOF state
@@ -43,19 +43,14 @@ void loop()
   mq131Value *= .9775171065;   //1000/1023
   mq131Value += 10;            //offset mq131 now stores correct value Ozone ppb
   mq131Value /= 100;           //Now in ppm (Range 10 - 1000 ppm)
-  mq4Value = analogRead(2);   
-  mq4Value*=9.5703125;             
-  mq4Value+=200;               //mq4 stores correct value for CH4, natural gas ppm (Range 200 - 10000 ppm)
   
-//  altiValue = analogRead(4);    //Temporarily removed for testing
+  altiValue = analogRead(4);    //Temporarily removed for testing
 
   Serial.print(mq135Value, DEC);  // prints the values calculated
   Serial.println("ppm");
   Serial.print(mq131Value, DEC);
   Serial.println("ppm");
-  Serial.print(mq4Value, DEC);
-  Serial.println("ppm");
-//  Serial.println(altiValue, DEC);
+  Serial.println(altiValue, DEC);
   Serial.println("----------------------");
   
   //Make sure the card is still present
@@ -66,21 +61,16 @@ void loop()
   }
   mq135File = SD.open(file, FILE_WRITE); //The 4 lines here create file pointers used to write to the SD card
   mq131File = SD.open(file2, FILE_WRITE);
-  mq4File = SD.open(file3, FILE_WRITE);
-  
-//  altiFile = SD.open(file4, FILE_WRITE); //Temporarily removed for testing 
-
+  altiFile = SD.open(file4, FILE_WRITE); //Temporarily removed for testing 
   mq135File.println(mq135Value); //printing to each file pointer and thereby the SD card itself
   mq131File.println(mq131Value);
-  mq4File.println(mq4Value);
   
-//  altiFile.println(altiValue); //Temporarily removed for testing 
+  altiFile.println(altiValue); //Temporarily removed for testing 
 
   mq135File.close(); //for the love of god close your file pointers
   mq131File.close();
-  mq4File.close();
   
-//  altiFile.close(); //Temporarily removed for testing 
+  altiFile.close(); //Temporarily removed for testing 
   
   if (mq135Value > 500) {
     // Activate digital output pin 8 - the LED will light up
