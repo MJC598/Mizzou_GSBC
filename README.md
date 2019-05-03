@@ -1,2 +1,2 @@
-# SEDS-GSBC-2018
-Arduino code for Mizzou SEDS Global Space Balloon Challenge 2018
+# Mizzou GSBC
+Code for Mizzou Space Program Global Space Balloon Challenge
